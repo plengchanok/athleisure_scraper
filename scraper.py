@@ -57,17 +57,17 @@ except Exception as e:
 driver.execute_script("document.documentElement.style.overflow = 'auto';")
 
 # Scroll down
-for _ in range(10):
+for _ in range(15):
     driver.execute_script("window.scrollBy(0, window.innerHeight);")
     time.sleep(2)
 
 html = driver.find_element(By.TAG_NAME, 'html')
 
-for _ in range(10):
+for _ in range(15):
     html.send_keys(Keys.PAGE_DOWN)
     time.sleep(2)
 
-def scroll_and_wait(driver, num_scrolls=10, wait_time=2):
+def scroll_and_wait(driver, num_scrolls=15, wait_time=2):
     actions = ActionChains(driver)
     for _ in range(num_scrolls):
         driver.execute_script("window.scrollBy(0, window.innerHeight);")
