@@ -1,10 +1,10 @@
-# ALO Scraper
+# alo yoga Scraper
 
 ## Overview
-This Jupyter Notebook (`alo_scraper.ipynb`) is designed to scrape data from ALO and extract relevant information for analysis. It automates the data collection process, allowing for structured extraction, transformation, and potential storage in a database or CSV file.
+This Jupyter Notebook (`alo_scraper.ipynb`) is designed to scrape data from alo and extract relevant information for analysis. It automates the data collection process, allowing for structured extraction, transformation, and potential storage in a database or CSV file.
 
 ## Features
-- Scrapes product or content-related data from ALO
+- Scrapes product or content-related data from alo
 - Extracts relevant details (e.g., titles, descriptions, prices, or other metadata)
 - Cleans and structures the extracted data for easy analysis
 - Saves output to a structured format (CSV, JSON, or database)
@@ -41,7 +41,7 @@ pip install requests beautifulsoup4 pandas selenium
 - Integrate with databases for automated storage.
 
 ## Notes
-- Ensure compliance with ALO's terms of service before scraping.
+- Ensure compliance with alo's terms of service before scraping.
 - Consider adding rate limiting or delay mechanisms to prevent being blocked.
 
 ## Author
