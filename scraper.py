@@ -76,10 +76,10 @@ def scroll_and_wait(driver, num_scrolls=5, wait_time=2):
 
 scroll_and_wait(driver)
 
-with open("debug_page.html", "w", encoding="utf-8") as f:
-    f.write(driver.page_source)
+# with open("debug_page.html", "w", encoding="utf-8") as f:
+#     f.write(driver.page_source)
 
-print("Saved HTML to debug_page.html. Open it in a browser to inspect.")
+# print("Saved HTML to debug_page.html. Open it in a browser to inspect.")
 
 # Get the page source after interactions
 page_source = driver.page_source
