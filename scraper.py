@@ -67,7 +67,7 @@ for _ in range(10):
     html.send_keys(Keys.PAGE_DOWN)
     time.sleep(2)
 
-def scroll_and_wait(driver, num_scrolls=5, wait_time=2):
+def scroll_and_wait(driver, num_scrolls=10, wait_time=2):
     actions = ActionChains(driver)
     for _ in range(num_scrolls):
         driver.execute_script("window.scrollBy(0, window.innerHeight);")
