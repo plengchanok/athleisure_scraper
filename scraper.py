@@ -127,11 +127,17 @@ for item in product_items:
         product_urls.append("URL not found")
     
     # Extract product image - using the correct selectors from the HTML
-    img_elem = item.select_one('img.normal') or item.select_one('img')
+    img_elem = item.select_one('.swiper-slide img.scrollable-image.loaded')
+
     if img_elem and 'src' in img_elem.attrs:
         img_url = img_elem['src']
-        if not img_url.startswith('http'):
-            img_url = 'https:' + img_url if img_url.startswith('//') else 'https://www.aloyoga.com' + img_url
+
+        # Ensure proper URL formatting
+        if img_url.startswith("//"):
+            img_url = "https:" + img_url
+        elif not img_url.startswith("http"):
+            img_url = "https://www.aloyoga.com" + img_url
+
         product_images.append(img_url)
     else:
         product_images.append("Image not found")
