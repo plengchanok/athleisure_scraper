@@ -1,4 +1,4 @@
-name: Scrape Alo Yoga Bestsellers
+name: Scrape Alo Yoga and Lululemon Bestsellers
 
 on:
   schedule:
@@ -33,8 +33,14 @@ jobs:
     - name: Create credentials file
       run: echo '${{ secrets.GOOGLE_CREDENTIALS }}' > credentials.json
       
-    - name: Run scraper
+    - name: Run Alo Yoga scraper
       run: python scraper.py
+      env:
+        CREDS_PATH: credentials.json
+        SHEET_ID: ${{ secrets.SHEET_ID }}
+        
+    - name: Run Lululemon scraper
+      run: python scraper_lululemon.py
       env:
         CREDS_PATH: credentials.json
         SHEET_ID: ${{ secrets.SHEET_ID }}

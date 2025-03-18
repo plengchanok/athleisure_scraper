@@ -146,6 +146,7 @@ for item in product_items:
 df = pd.DataFrame({
     'Index': range(1, len(product_names) + 1),
     'Date': [pd.Timestamp.today().strftime('%Y-%m-%d')] * len(product_names),
+    'Brand': ['alo yoga'] * len(product_names),
     'Product Name': product_names,
     'Price': product_prices,
     'URL': product_urls,
