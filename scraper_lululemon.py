@@ -45,7 +45,7 @@ try:
     
     # Wait for initial page load - increase time
     print("Waiting for page to load...")
-    time.sleep(10)  # Increased from 5 to 10 seconds
+    time.sleep(5)
     
     # Try to close any modals or popups
     try:
