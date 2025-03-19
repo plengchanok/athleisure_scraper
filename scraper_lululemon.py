@@ -83,7 +83,7 @@ try:
     # Scroll down to load all products
     print("Scrolling to load all products...")
     actions = ActionChains(driver)
-    num_scrolls = 12
+    num_scrolls = 25
     wait_time = 2
     for i in range(num_scrolls):
         print(f"Scroll {i+1}/{num_scrolls}")
