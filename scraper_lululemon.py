@@ -84,7 +84,7 @@ try:
     print("Scrolling to load all products...")
     actions = ActionChains(driver)
     num_scrolls = 12
-    wait_time = 2
+    wait_time = 3
     for i in range(num_scrolls):
         print(f"Scroll {i+1}/{num_scrolls}")
         driver.execute_script("window.scrollBy(0, window.innerHeight);")
