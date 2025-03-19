@@ -11,9 +11,6 @@ import pandas as pd
 import time
 from bs4 import BeautifulSoup
 import re
-import gspread
-from google.oauth2.service_account import Credentials
-import os
 
 try:
     # Setup Selenium
@@ -135,7 +132,7 @@ try:
             except Exception as e:
                 print(f"Error processing product tile: {e}")
         
-        # Save to CSV
+            # Save to CSV
         if products:
             df = pd.DataFrame(products)
             csv_filename = 'lululemon_products.csv'
@@ -143,42 +140,39 @@ try:
             print(f"Successfully scraped {len(df)} products. Data saved to {csv_filename}.")
             print("\nSample data:")
             print(df.head())
+            
+            # Google Sheets integration moved inside the try block where df is defined
+            import gspread
+            from google.oauth2.service_account import Credentials
+            import os
+
+            creds_path = os.environ.get('CREDS_PATH', '/Users/pleng/python/pleng.io/spatial-framing-452703-g4-d9e7337e6b02.json')
+
+            # Authenticate with Google Sheets
+            scopes = ["https://www.googleapis.com/auth/spreadsheets"]
+            creds = Credentials.from_service_account_file(creds_path, scopes=scopes)
+            client = gspread.authorize(creds)
+
+            # Open the Google Sheet
+            SHEET_ID = os.environ.get('SHEET_ID', "1G4cuYs_7qD1ft6OEhovLjj8zowQc92yYHQz2gSmLpp8")
+            sheet_name = "lululemon"
+            sheet = client.open_by_key(SHEET_ID).worksheet(sheet_name)
+
+            # Convert DataFrame to a list of lists for Google Sheets
+            data_to_append = df.values.tolist()
+
+            # Append new data
+            sheet.append_rows(data_to_append)
+
+            print("Data successfully uploaded to Google Sheets!")
         else:
             print("No product data found!")
             
     except Exception as e:
-        print(f"Error in extract_product_data: {e}")
-    
-except Exception as e:
-    print(f"An error occurred in main: {e}")
+        print(f"Error in script: {e}")
 
 finally:
     # Close the driver
     print("Closing browser...")
     if 'driver' in locals():
         driver.quit()
-
-creds_path = os.environ.get('CREDS_PATH', '/Users/pleng/python/pleng.io/spatial-framing-452703-g4-d9e7337e6b02.json')
-
-# Authenticate with Google Sheets
-scopes = ["https://www.googleapis.com/auth/spreadsheets"]
-creds = Credentials.from_service_account_file(creds_path, scopes=scopes)
-client = gspread.authorize(creds)
-
-# Open the Google Sheet (replace with your Sheet ID)
-SHEET_ID = os.environ.get('SHEET_ID', "1G4cuYs_7qD1ft6OEhovLjj8zowQc92yYHQz2gSmLpp8")
-sheet_name = "lululemon"
-sheet = client.open_by_key(SHEET_ID).worksheet(sheet_name)
-
-# Convert DataFrame to a list of lists for Google Sheets
-data_to_append = df.values.tolist()
-
-# Append new data (don't overwrite existing)
-sheet.append_rows(data_to_append)
-
-print("Data successfully uploaded to Google Sheets!")
-
-# %%
-
-
-
