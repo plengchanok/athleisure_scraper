@@ -44,12 +44,3 @@ jobs:
       env:
         CREDS_PATH: credentials.json
         SHEET_ID: ${{ secrets.SHEET_ID }}
-    
-    - name: Upload debug files
-      uses: actions/upload-artifact@v3
-      if: always()  
-      with:
-        name: debug-files
-        path: |
-          debug_page_lululemon.html
-        retention-days: 7
