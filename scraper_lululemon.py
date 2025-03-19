@@ -13,45 +13,65 @@ from bs4 import BeautifulSoup
 import re
 
 try:
-    # Setup Selenium
+    # Setup Selenium with more realistic browser settings
     print("Setting up Chrome driver...")
     options = webdriver.ChromeOptions()
-    options.add_argument("--headless")
+    options.add_argument("--headless=new")  # Use the newer headless mode
     options.add_argument("--window-size=1920x1080")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--lang=en")
+    # Add user agent to appear more like a real browser
+    options.add_argument("user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
+    # Disable automation flags
+    options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    options.add_experimental_option("useAutomationExtension", False)
     
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    
+    # Execute CDP commands to prevent detection
+    driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
+        "source": """
+        Object.defineProperty(navigator, 'webdriver', {
+            get: () => undefined
+        });
+        """
+    })
     
     # Open the Lululemon product page
     url = "https://shop.lululemon.com/c/women-bestsellers/n16o10znskl"
     print(f"Opening URL: {url}")
     driver.get(url)
     
-    # Wait for initial page load
+    # Wait for initial page load - increase time
     print("Waiting for page to load...")
-    time.sleep(5)
+    time.sleep(10)  # Increased from 5 to 10 seconds
     
-    # Close the newsletter modal (15% off popup)
+    # Try to close any modals or popups
     try:
-        print("Attempting to close the newsletter modal...")
+        print("Attempting to close modals and popups...")
         
-        # Click outside the modal (overlay click to dismiss)
-        try:
-            modal_wrapper = WebDriverWait(driver, 3).until(
-                EC.presence_of_element_located((By.CLASS_NAME, "lululemon_mwa_promotions__modalWrapper__c3Tt0V"))
-            )
-            # Click outside the modal
-            action = ActionChains(driver)
-            action.move_by_offset(5, 5).click().perform()
-            print("Tried clicking outside the modal")
-            time.sleep(1)
-        except Exception as e:
-            print(f"Overlay click approach failed: {e}")
+        # Look for common close buttons
+        close_button_xpaths = [
+            "//button[contains(@class, 'close')]",
+            "//div[contains(@class, 'modal')]//button",
+            "//button[contains(text(), 'Close')]",
+            "//button[contains(@aria-label, 'Close')]"
+        ]
+        
+        for xpath in close_button_xpaths:
+            try:
+                close_buttons = driver.find_elements(By.XPATH, xpath)
+                for button in close_buttons:
+                    if button.is_displayed():
+                        button.click()
+                        print(f"Clicked a close button: {xpath}")
+                        time.sleep(1)
+            except Exception as e:
+                continue
     
     except Exception as e:
-        print(f"Failed to close the newsletter modal: {e}")
+        print(f"Failed to close modals: {e}")
     
     # Fix any scrolling issues
     print("Enabling scrolling...")
@@ -131,16 +151,10 @@ try:
                 products.append(product)
             except Exception as e:
                 print(f"Error processing product tile: {e}")
-        
-            # Save to CSV
+
         if products:
             df = pd.DataFrame(products)
-            csv_filename = 'lululemon_products.csv'
-            df.to_csv(csv_filename, index=False)
-            print(f"Successfully scraped {len(df)} products. Data saved to {csv_filename}.")
-            print("\nSample data:")
-            print(df.head())
-            
+
             # Google Sheets integration moved inside the try block where df is defined
             import gspread
             from google.oauth2.service_account import Credentials
