@@ -1,52 +1,84 @@
-# alo yoga Scraper
+# Athleisure Brand Scraper
 
 ## Overview
-This Jupyter Notebook (`alo_scraper.ipynb`) is designed to scrape data from alo and extract relevant information for analysis. It automates the data collection process, allowing for structured extraction, transformation, and potential storage in a database or CSV file.
+This repository contains scrapers for various athleisure brands to extract product information from their websites. It automates the data collection process, allowing for structured extraction, transformation, and storage in Google Sheets.
 
 ## Features
-- Scrapes product or content-related data from alo
-- Extracts relevant details (e.g., titles, descriptions, prices, or other metadata)
+- Scrapes product data from multiple athleisure brands:
+  - Alo Yoga (bestsellers and new arrivals)
+  - Lululemon (bestsellers and new arrivals)
+  - Vuori (women's new arrivals)
+  - Beyond Yoga (new arrivals)
+  - Athleta (new arrivals)
+- Extracts relevant details (product names, prices, URLs, and image URLs)
 - Cleans and structures the extracted data for easy analysis
-- Saves output to a structured format (CSV, JSON, or database)
+- Saves output directly to Google Sheets for easy access and visualization
 
 ## Requirements
-To run this notebook, ensure you have the following dependencies installed:
+To run these scrapers, ensure you have the following dependencies installed:
 
 - Python 3.x
-- Jupyter Notebook
-- Requests
+- Selenium
+- WebDriver Manager
 - BeautifulSoup4
 - Pandas
-- Selenium (if applicable)
+- gspread (for Google Sheets integration)
+- Google Auth libraries
 
-You can install these using:
+You can install all dependencies using:
 ```sh
-pip install requests beautifulsoup4 pandas selenium
+pip install -r requirements.txt
 ```
 
 ## Usage
-1. Open the notebook in Jupyter:
+You can run individual scrapers or run all of them at once:
+
+1. To run all scrapers:
    ```sh
-   jupyter notebook alo_scraper.ipynb
+   python run_all_scrapers.py
    ```
-2. Run the cells sequentially to execute the scraper.
-3. Modify configurations as needed (e.g., target URLs, output format, storage options).
+
+2. To run individual scrapers:
+   ```sh
+   python scraper_alo_new.py
+   python scraper_lululemon_new.py
+   python scraper_vuori.py
+   python scraper_beyond_yoga.py
+   python scraper_athleta.py
+   ```
+
+3. Set up Google Sheets credentials:
+   - Create a service account in Google Cloud Console
+   - Download the JSON credentials file
+   - Set the `CREDS_PATH` environment variable to point to your credentials file
+   - Set the `SHEET_ID` environment variable to your Google Sheet ID
 
 ## Output
-- The extracted data is saved in CSV or JSON format in the designated output directory.
+- The extracted data is saved directly to Google Sheets in separate worksheets for each brand.
 
 ## Customization
-- Update the URL list to scrape different pages.
-- Modify the parsing logic to extract additional fields.
-- Integrate with databases for automated storage.
+- Update the URLs in each scraper to target different pages or categories
+- Modify the parsing logic to extract additional fields
+- Adjust the scrolling parameters to ensure all products are loaded
+- Change the Google Sheets worksheet names or structure
 
 ## Notes
-- Ensure compliance with alo's terms of service before scraping.
-- Consider adding rate limiting or delay mechanisms to prevent being blocked.
+- Ensure compliance with each brand's terms of service before scraping
+- The scrapers include rate limiting and delays to prevent being blocked
+- Each scraper handles common popup and modal dialogs that might interfere with scraping
+
+## Data Structure
+Each scraper collects the following information:
+- Index: Sequential number for each product
+- Date: Date when the data was scraped
+- Brand: Name of the brand
+- Product Name: Name of the product
+- Price: Price of the product
+- URL: Link to the product page
+- Image URL: Link to the product image
 
 ## Author
 Pleng Witayaweerasak
 
 ## License
 This project is open-source. Modify and distribute as needed.
-
