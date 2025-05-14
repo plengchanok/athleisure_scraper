@@ -17,7 +17,7 @@ try:
     # Setup Selenium with more realistic browser settings
     print("Setting up Chrome driver...")
     options = webdriver.ChromeOptions()
-    options.add_argument("--headless=new")  # Use the newer headless mode
+    # options.add_argument("--headless=new")  # Use the newer headless mode
     options.add_argument("--window-size=1920x1080")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
@@ -48,6 +48,11 @@ try:
     print("Waiting for page to load...")
     time.sleep(10)
     
+    # Save the HTML page for debugging
+    with open("athleta_debug_page.html", "w", encoding="utf-8") as f:
+        f.write(driver.page_source)
+    print("Saved current HTML page to athleta_debug_page.html for debugging.")
+    
     # Try to close any modals or popups
     try:
         print("Attempting to close modals and popups...")
@@ -58,6 +63,7 @@ try:
             "//div[contains(@class, 'modal')]//button",
             "//button[contains(text(), 'Close')]",
             "//button[contains(@aria-label, 'Close')]",
+            "//button[contains(@aria-label, 'Dismiss this popup')]",
             "//button[@aria-label='Close']",
             "//span[@class='close-button']"
         ]
@@ -72,6 +78,16 @@ try:
                         time.sleep(1)
             except Exception as e:
                 continue
+
+        # Try clicking outside the modal to close it
+        try:
+            ActionChains(driver).move_by_offset(10, 10).click().perform()
+            print("Clicked outside the modal to close it.")
+            # Move the mouse back to the center to avoid offset issues in future actions
+            ActionChains(driver).move_by_offset(-10, -10).perform()
+            time.sleep(1)
+        except Exception as e:
+            print(f"Failed to click outside the modal: {e}")
     
     except Exception as e:
         print(f"Failed to close modals: {e}")
@@ -115,26 +131,25 @@ try:
         
         for tile in product_tiles:
             try:
-                # Extract product name
-                name_element = tile.select_one('.product-card__name')
+                # Product Name
+                name_element = tile.select_one('div.sitewide-w8zxc')
                 name = name_element.text.strip() if name_element else "Unknown"
-                
-                # Extract price
-                price_element = tile.select_one('.product-price__strike-through-price') or tile.select_one('.product-price__regular')
+
+                # Product URL
+                url_element = tile.select_one('a.sitewide-0')
+                url = url_element.get("href") if url_element else "Unknown"
+                if isinstance(url, str) and url.startswith("/"):
+                    url = "https://athleta.gap.com" + url
+
+                # Image URL
+                img_element = tile.select_one('.cat_product-image img')
+                image_url = img_element.get("src") if img_element else ""
+                if isinstance(image_url, str) and image_url.startswith("/"):
+                    image_url = "https://athleta.gap.com" + image_url
+
+                # Price
+                price_element = tile.select_one('.product-card-price span')
                 price = price_element.text.strip() if price_element else "Unknown"
-                
-                # Extract product URL
-                link_element = tile.select_one('a.product-card__link')
-                url = "https://athleta.gap.com" + link_element.get("href") if link_element and link_element.get("href") else "Unknown"
-                
-                # Extract image URL
-                img_element = tile.select_one('img.product-card__image')
-                image_url = ""
-                if img_element:
-                    if img_element.get("src"):
-                        image_url = img_element.get("src")
-                    elif img_element.get("data-src"):
-                        image_url = img_element.get("data-src")
                 
                 # Create product dictionary
                 product = {

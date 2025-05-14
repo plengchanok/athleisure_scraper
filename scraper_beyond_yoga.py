@@ -12,12 +12,13 @@ from bs4 import BeautifulSoup
 import gspread
 from google.oauth2.service_account import Credentials
 import os
+from bs4.element import Tag
 
 try:
     # Setup Selenium with more realistic browser settings
     print("Setting up Chrome driver...")
     options = webdriver.ChromeOptions()
-    # options.add_argument("--headless=new")  # Comment out or remove this line
+    options.add_argument("--headless=new")
     options.add_argument("--window-size=1920x1080")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
@@ -122,18 +123,30 @@ try:
                 price_element = tile.select_one('.price-item--regular')
                 price = price_element.text.strip() if price_element else "Unknown"
                 
-                # Extract product URL
-                link_element = tile.select_one('a.product-card__info-wrapper')
-                url = "https://beyondyoga.com" + link_element.get("href") if link_element and link_element.get("href") else "Unknown"
-                
-                # Extract image URL
-                img_element = tile.select_one('img[src*="cdn.shop"]')
+                # Extract image URL from <picture> with class 'lazypicture'
+                picture_element = tile.select_one('picture.lazypicture')
                 image_url = ""
-                if img_element:
-                    if img_element.get("src"):
-                        image_url = "https:" + img_element.get("src")
-                    elif img_element.get("data-src"):
-                        image_url = "https:" + img_element.get("data-src")
+                if picture_element:
+                    img_element = picture_element.find('img')
+                    if isinstance(img_element, Tag):
+                        srcset = img_element.get("srcset", "")
+                        if isinstance(srcset, str) and srcset:
+                            urls = srcset.split(", ")
+                            highest_res_url = urls[-1].split(" ")[0]
+                            if isinstance(highest_res_url, str):
+                                image_url = "https:" + highest_res_url if highest_res_url.startswith("//") else highest_res_url
+                        elif img_element.get("src"):
+                            src = img_element.get("src")
+                            if isinstance(src, str):
+                                image_url = "https:" + src if src.startswith("//") else src
+
+                # Fix product URL concatenation linter error
+                link_element = tile.select_one('a.product-card__info-wrapper')
+                url = "Unknown"
+                if link_element:
+                    href = link_element.get("href")
+                    if isinstance(href, str):
+                        url = "https://beyondyoga.com" + href if href.startswith("/") else href
                 
                 # Create product dictionary
                 product = {
