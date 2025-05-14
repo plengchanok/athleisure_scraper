@@ -17,7 +17,7 @@ try:
     # Setup Selenium with more realistic browser settings
     print("Setting up Chrome driver...")
     options = webdriver.ChromeOptions()
-    # options.add_argument("--headless=new")  # Use the newer headless mode
+    options.add_argument("--headless=new")  # Use the newer headless mode
     options.add_argument("--window-size=1920x1080")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
@@ -47,11 +47,6 @@ try:
     # Wait for initial page load
     print("Waiting for page to load...")
     time.sleep(10)
-    
-    # Save the HTML page for debugging
-    with open("athleta_debug_page.html", "w", encoding="utf-8") as f:
-        f.write(driver.page_source)
-    print("Saved current HTML page to athleta_debug_page.html for debugging.")
     
     # Try to close any modals or popups
     try:

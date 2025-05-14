@@ -82,11 +82,11 @@ try:
         document.documentElement.style.overflow = 'auto';
         document.body.style.overflow = 'auto';
     """)
-    
+
     # Scroll down to load all products
     print("Scrolling to load all products...")
     actions = ActionChains(driver)
-    num_scrolls = 20
+    num_scrolls = 10
     wait_time = 2
     for i in range(num_scrolls):
         print(f"Scroll {i+1}/{num_scrolls}")
@@ -110,45 +110,73 @@ try:
         products = []
         
         # Find all product tiles
-        product_tiles = soup.select('.product-card')
+        product_tiles = soup.select('div.MuiBox-root.mui-style-0')
         print(f"Found {len(product_tiles)} product tiles")
         
         for tile in product_tiles:
             try:
-                # Extract product name
-                name_element = tile.select_one('.product-card__title')
-                name = name_element.text.strip() if name_element else "Unknown"
+                # Product Name
+                name_element = tile.select_one('p[data-product-name]')
+                if not name_element:
+                    print("Skipping tile - no name element found")
+                    continue
+                    
+                name = name_element['data-product-name']
+
+                # Color and Price (both in p.MuiTypography-root.MuiTypography-body2)
+                color_elements = tile.select('p.MuiTypography-root.MuiTypography-body2')
+                if len(color_elements) < 2:
+                    continue
+                    
+                # Get color from first element
+                color = color_elements[0].text.strip()
                 
-                # Extract price
-                price_element = tile.select_one('.product-card__price')
-                price = price_element.text.strip() if price_element else "Unknown"
-                
-                # Extract product URL
-                link_element = tile.select_one('a.product-card__link')
-                url = "https://vuoriclothing.com" + link_element.get("href") if link_element and link_element.get("href") else "Unknown"
-                
-                # Extract image URL
-                img_element = tile.select_one('img.product-card__image')
+                # Find price element - it should contain a $ symbol
+                price = "Unknown"
+                for element in color_elements:
+                    if '$' in element.text:
+                        price = element.text.strip()
+                        break
+
+                # Product URL
+                url = name_element['data-product-path']
+                if isinstance(url, str) and url.startswith("/"):
+                    url = "https://vuoriclothing.com" + url
+
+                # Image URL - try multiple approaches
                 image_url = ""
-                if img_element:
-                    if img_element.get("src"):
-                        image_url = img_element.get("src")
-                    elif img_element.get("data-src"):
-                        image_url = img_element.get("data-src")
-                
+                # Try finding image in the tile itself
+                img_tag = tile.find('img')
+                if img_tag and 'src' in img_tag.attrs:
+                    image_url = img_tag['src']
+                    # Remove size parameters to get full size image
+                    image_url = image_url.split('?')[0]
+                else:
+                    # Try finding image in parent elements
+                    parent = tile.parent
+                    while parent and not image_url:
+                        img_tag = parent.find('img')
+                        if img_tag and 'src' in img_tag.attrs:
+                            image_url = img_tag['src']
+                            # Remove size parameters to get full size image
+                            image_url = image_url.split('?')[0]
+                        parent = parent.parent
+
                 # Create product dictionary
                 product = {
-                    'index': len(products) + 1,
-                    'date': pd.Timestamp.today().strftime('%Y-%m-%d'),
-                    'brand': "vuori",
-                    'name': name,
-                    'price': price,
-                    'url': url,
-                    'image_url': image_url
+                    'Index': len(products) + 1,
+                    'Date': pd.Timestamp.today().strftime('%Y-%m-%d'),
+                    'Brand': "vuori",
+                    'Product Name': name,
+                    'Price': price,
+                    'URL': url,
+                    'Image URL': image_url
                 }
+                print(f"Created product: {product}")
                 products.append(product)
             except Exception as e:
-                print(f"Error processing product tile: {e}")
+                print(f"Error processing product tile: {str(e)}")
+                print(f"Tile HTML: {tile}")
 
         if products:
             # Create DataFrame
