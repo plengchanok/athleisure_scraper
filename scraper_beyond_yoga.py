@@ -17,7 +17,7 @@ try:
     # Setup Selenium with more realistic browser settings
     print("Setting up Chrome driver...")
     options = webdriver.ChromeOptions()
-    options.add_argument("--headless=new")  # Use the newer headless mode
+    # options.add_argument("--headless=new")  # Comment out or remove this line
     options.add_argument("--window-size=1920x1080")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
@@ -85,7 +85,7 @@ try:
     # Scroll down to load all products
     print("Scrolling to load all products...")
     actions = ActionChains(driver)
-    num_scrolls = 20
+    num_scrolls = 10
     wait_time = 2
     for i in range(num_scrolls):
         print(f"Scroll {i+1}/{num_scrolls}")
@@ -108,32 +108,32 @@ try:
         soup = BeautifulSoup(html_content, 'html.parser')
         products = []
         
-        # Find all product tiles
-        product_tiles = soup.select('.product-item')
+        # Find all product cards
+        product_tiles = soup.select('li.collection-grid__grid-item')
         print(f"Found {len(product_tiles)} product tiles")
         
         for tile in product_tiles:
             try:
                 # Extract product name
-                name_element = tile.select_one('.product-item__title')
+                name_element = tile.select_one('.product-card__title')
                 name = name_element.text.strip() if name_element else "Unknown"
                 
                 # Extract price
-                price_element = tile.select_one('.product-item__price')
+                price_element = tile.select_one('.price-item--regular')
                 price = price_element.text.strip() if price_element else "Unknown"
                 
                 # Extract product URL
-                link_element = tile.select_one('a.product-item__link')
+                link_element = tile.select_one('a.product-card__info-wrapper')
                 url = "https://beyondyoga.com" + link_element.get("href") if link_element and link_element.get("href") else "Unknown"
                 
                 # Extract image URL
-                img_element = tile.select_one('img.product-item__image')
+                img_element = tile.select_one('img[src*="cdn.shop"]')
                 image_url = ""
                 if img_element:
                     if img_element.get("src"):
-                        image_url = img_element.get("src")
+                        image_url = "https:" + img_element.get("src")
                     elif img_element.get("data-src"):
-                        image_url = img_element.get("data-src")
+                        image_url = "https:" + img_element.get("data-src")
                 
                 # Create product dictionary
                 product = {
