@@ -1,4 +1,4 @@
-name: Scrape Alo Yoga and Lululemon Bestsellers
+name: Scrape All Athleisure Brands
 
 on:
   schedule:
@@ -33,14 +33,58 @@ jobs:
     - name: Create credentials file
       run: echo '${{ secrets.GOOGLE_CREDENTIALS }}' > credentials.json
       
-    - name: Run Alo Yoga scraper
+    - name: Run all scrapers
+      run: python run_all_scrapers.py
+      env:
+        CREDS_PATH: credentials.json
+        SHEET_ID: ${{ secrets.SHEET_ID }}
+        
+    # Individual scrapers as fallback in case the combined script fails
+    - name: Run Alo Yoga bestsellers scraper (fallback)
+      if: failure()
       run: python scraper.py
       env:
         CREDS_PATH: credentials.json
         SHEET_ID: ${{ secrets.SHEET_ID }}
         
-    - name: Run Lululemon scraper
+    - name: Run Lululemon bestsellers scraper (fallback)
+      if: failure()
       run: python scraper_lululemon.py
+      env:
+        CREDS_PATH: credentials.json
+        SHEET_ID: ${{ secrets.SHEET_ID }}
+        
+    - name: Run Alo Yoga new arrivals scraper (fallback)
+      if: failure()
+      run: python scraper_alo_new.py
+      env:
+        CREDS_PATH: credentials.json
+        SHEET_ID: ${{ secrets.SHEET_ID }}
+        
+    - name: Run Lululemon new arrivals scraper (fallback)
+      if: failure()
+      run: python scraper_lululemon_new.py
+      env:
+        CREDS_PATH: credentials.json
+        SHEET_ID: ${{ secrets.SHEET_ID }}
+        
+    - name: Run Vuori scraper (fallback)
+      if: failure()
+      run: python scraper_vuori.py
+      env:
+        CREDS_PATH: credentials.json
+        SHEET_ID: ${{ secrets.SHEET_ID }}
+        
+    - name: Run Beyond Yoga scraper (fallback)
+      if: failure()
+      run: python scraper_beyond_yoga.py
+      env:
+        CREDS_PATH: credentials.json
+        SHEET_ID: ${{ secrets.SHEET_ID }}
+        
+    - name: Run Athleta scraper (fallback)
+      if: failure()
+      run: python scraper_athleta.py
       env:
         CREDS_PATH: credentials.json
         SHEET_ID: ${{ secrets.SHEET_ID }}
