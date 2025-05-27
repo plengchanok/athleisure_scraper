@@ -97,10 +97,10 @@ try:
     # Now proceed with scraping the content
     print("Beginning to scrape product data...")
     
-    # Save the page for debugging
-    with open("debug_page_lululemon.html", "w", encoding="utf-8") as f:
-        f.write(driver.page_source)
-    print("Saved HTML to debug_page_lululemon.html for inspection.")
+    # # Save the page for debugging
+    # with open("debug_page_lululemon.html", "w", encoding="utf-8") as f:
+    #     f.write(driver.page_source)
+    # print("Saved HTML to debug_page_lululemon.html for inspection.")
     
     # Extract product data from the page
     try:
