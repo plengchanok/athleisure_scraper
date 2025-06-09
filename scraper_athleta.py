@@ -127,23 +127,23 @@ try:
         for tile in product_tiles:
             try:
                 # Product Name
-                name_element = tile.select_one('div.sitewide-w8zxc')
+                name_element = tile.select_one('.sitewide-1evqbfz')
                 name = name_element.text.strip() if name_element else "Unknown"
 
                 # Product URL
-                url_element = tile.select_one('a.sitewide-0')
+                url_element = tile.select_one('a[href*="/browse/product.do"]')
                 url = url_element.get("href") if url_element else "Unknown"
                 if isinstance(url, str) and url.startswith("/"):
                     url = "https://athleta.gap.com" + url
 
                 # Image URL
-                img_element = tile.select_one('.cat_product-image img')
+                img_element = tile.select_one('img[src*="/webcontent/"]')
                 image_url = img_element.get("src") if img_element else ""
                 if isinstance(image_url, str) and image_url.startswith("/"):
                     image_url = "https://athleta.gap.com" + image_url
 
                 # Price
-                price_element = tile.select_one('.product-card-price span')
+                price_element = tile.select_one('.product-card-price span, [class*="price"]')
                 price = price_element.text.strip() if price_element else "Unknown"
                 
                 # Create product dictionary
