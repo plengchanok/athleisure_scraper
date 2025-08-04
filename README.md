@@ -3,6 +3,9 @@
 ## Overview
 This repository contains scrapers for various athleisure brands to extract product information from their websites. It automates the data collection process, allowing for structured extraction, transformation, and storage in Google Sheets.
 
+## Dashboard
+To view the Looker dashboard please click [here] (https://lookerstudio.google.com/u/0/reporting/22020cb3-3537-4db3-a347-1a01886eaa15/page/p_l6vob0yisd)
+
 ## Features
 - Scrapes product data from multiple athleisure brands:
   - Alo Yoga (bestsellers and new arrivals)
